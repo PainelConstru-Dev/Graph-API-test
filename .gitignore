@@ -1,0 +1,5 @@
+*.txt
+*.pyc
+*.csv
+*.json
+src/defines
