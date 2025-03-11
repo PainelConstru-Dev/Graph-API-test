@@ -44,8 +44,8 @@ def verify_username(username, already_searched):
     return True
 
 def main():
-    input_csv_file = 'src/input/input.csv'
-    output_json_file = 'src/output/output.json'
+    input_csv_file = 'src/data/input/input.csv'
+    output_json_file = 'src/data/output/output.json'
     params = getCreds()
     usernames = get_usernames_from_csv(input_csv_file)
     not_found_usernames = search_accounts(usernames, params, output_json_file)

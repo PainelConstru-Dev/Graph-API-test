@@ -163,8 +163,8 @@ def collect_post_date(description):
 
 def main():
     load_dotenv("src/defines/.env")
-    input_csv_file = "src/input/input.csv"
-    output_json_file = "src/output/outputSelenium.json"
+    input_csv_file = "src/data/input/input.csv"
+    output_json_file = "src/data/output/outputSelenium.json"
     usernames = get_usernames_from_csv(input_csv_file)
     browser = navigator_initializer()
     search_users(browser, usernames, output_json_file)
