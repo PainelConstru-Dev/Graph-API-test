@@ -1,4 +1,5 @@
 from defines.defines import getCreds, makeApiCall
+from instagramScrapSelenium import *
 from save_load import get_usernames_from_csv, save_profile_info_json
 
 def getAccountInfo(username, params):
@@ -19,38 +20,72 @@ def getAccountInfo(username, params):
 
 	return makeApiCall( url, endpointParams, params['debug'] ) # make the api call
 
-def search_accounts(usernames, params, output_json_file):
+def search_accounts(browser, usernames, params, output_json_file):
     profiles = []
     already_searched = []
-    not_found = []
     for username in usernames:
         print(f"Searching for {username}")
         if verify_username(username, already_searched):
             response = getAccountInfo(username, params)
             if 'error' in response['json_data']:
-                print(f"Error: {response['json_data']['error']['message']}")
-                not_found.append(username)
-                continue
-            profile = response['json_data']['business_discovery']
+                message = response['json_data']['error']['message']
+                if message == "(#4) Application request limit reached":
+                    print("Application request limit reached.")
+                    time.sleep(3600)
+                    response = getAccountInfo(username, params)
+                else:
+                    print(message)
+                    profiles.append({"username": username, "business_account": 'false'})
+                    continue
+            links = search_links_selenium(browser, username)
+            profile = save_profile(username, response, links)
             profiles.append(profile)
-            save_profile_info_json(profile, output_json_file)            
-        already_searched.append(username)
-    return not_found
-
+            save_profile_info_json(profile, output_json_file)           
+            already_searched.append(username)
+    return profiles
 
 def verify_username(username, already_searched):
-    if username == "explore" or username == "reel" or username in already_searched:
+    if username == "explore" or username == "reel" or username == "p" or username in already_searched:
+        print(f"Invalid user id.")
         return False
     return True
 
+def save_profile(username, response, links):
+    business_discovery = response.get('json_data', {}).get('business_discovery', {})
+    name = business_discovery.get('name')
+    follows_count = business_discovery.get('follows_count')
+    followers_count = business_discovery.get('followers_count')
+    media_count = business_discovery.get('media_count')
+    biography = business_discovery.get('biography')
+    profile_picture_url = business_discovery.get('profile_picture_url')
+    media = business_discovery.get('media', {}).get('data', [])
+    profile = {
+        "username": username,
+        "name": name,
+        "business_account": 'true',
+        "follows_count": follows_count,
+        "followers_count": followers_count,
+        "media_count": media_count,
+        "biography": biography,
+        "links": links,
+        "profile_picture_url": profile_picture_url,
+        "media": media
+    }
+    return profile
+
 def main():
     input_csv_file = 'src/data/input/input.csv'
-    output_json_file = 'src/data/output/output.json'
+    input_csv_file_selenium = "src/data/input/input.csv"
+    output_graph = 'src/data/output/graphAPI_results.json'
+    output_selenium = "src/data/output/selenium_results.json"
+    output_graph_selenium = "src/data/output/graphAPI_selenium_results.json"
     params = getCreds()
     usernames = get_usernames_from_csv(input_csv_file)
-    not_found_usernames = search_accounts(usernames, params, output_json_file)
-    
-    print(f"Usernames not found: {not_found_usernames}")
+    browser = navigator_initializer()
+    login_instagram(browser)
+    profiles = search_accounts(browser, usernames, params, output_graph_selenium)
+    search_accounts_selenium(browser, profiles, output_selenium)
 
+    
 if __name__ == '__main__':
     main()

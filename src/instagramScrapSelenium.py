@@ -13,6 +13,7 @@ def navigator_initializer():
     return webdriver.Firefox()
 
 def instagram_login(browser):
+    load_dotenv("src/defines/.env")
     USERNAME = os.getenv('USER')
     PASSWORD = os.getenv('PASSWORD')
     browser.get("https://www.instagram.com/")
@@ -37,30 +38,41 @@ def ignore_save_login(browser):
         not_now = WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button' and @tabindex='0' and contains(text(), 'Agora não')]")))
         not_now.click()
     except:
-        print("Error clicking in not now button.")
+        exit
 
-def search_users(browser, usernames, output_json_file):
+def login_instagram(browser):
     instagram_login(browser)
     ignore_save_login(browser)
-    for username in usernames:
-        if verify_username(browser, username):
-            if search_user(browser, username):
-                biography = collect_biography(browser)
-                link_urls = collect_links(browser)
-                posts = collect_posts(browser)
-                profile_info = {"Username": username, "Biography": biography, "Links": link_urls, "Posts": posts}
-                save_profile_info_json(profile_info, output_json_file)
-                print(f"The profile information of {username} has been saved.")
-            else:
+
+def search_links_selenium(browser, username):
+    if search_user(browser, username):
+        links = collect_links(browser)
+        return links
+
+def search_accounts_selenium(browser, profiles, output_selenium):
+    for profile in profiles:
+        username = profile['username']
+        print(f"Searching for {username}")
+        if search_user(browser, username):
+            if profile['business_account'] == 'true':
                 continue
+            biography = collect_biography(browser)
+            link_urls = collect_links(browser)
+            posts = collect_posts(browser)
+            profile_info = {
+                "username": username,
+                "biography": biography, 
+                "links": link_urls, 
+                "media_count": len(posts),
+                "media": posts
+                }
+            save_profile_info_json(profile_info, output_selenium)
+        else:
+            continue
 
 def search_user(browser, username):
-    try:
-        time.sleep(random.randint(1, 3))
-        browser.get(f"https://www.instagram.com/{username}/")
-    except:
-        print("Error searching Username.")
-        return False
+    time.sleep(random.randint(1, 3))
+    browser.get(f"https://www.instagram.com/{username}/")
     try:
         invalid_Username = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Esta página não está disponível')]"))
@@ -68,7 +80,6 @@ def search_user(browser, username):
         print("User not found.")
         return False
     except:
-        print("User found.")
         pass
     try:
         private_account = WebDriverWait(browser, 10).until(
@@ -77,26 +88,18 @@ def search_user(browser, username):
         print("User account is private.")
         return False
     except:
-        print("User account is public.")
         return True
-
-def verify_username(browser, username):
-    if username == "explore" or username == "reel":
-        return False
-    return True
 
 def collect_biography(browser):
     try:
         try:
             WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='button' and contains(., 'mais')]//span[@dir='auto']"))).click()
         except:
-            print("Error clicking in more button.")
             pass
         return WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "//div[@role='button']//span[@dir='auto']"))
         ).text
     except:
-        print("Error collecting biography.")
         return ""
         
 def collect_links(browser):
@@ -121,14 +124,12 @@ def collect_links(browser):
             ).text
             link_urls.append(links)
         except:
-            print("Error collecting links.")
             pass
     return link_urls
 
 def collect_posts(browser):
     posts, posts_src = [], []
     altura_atual = browser.execute_script("return document.body.scrollHeight")
-    count = 0
     while True:
         try:
             posts_elements = WebDriverWait(browser, 10).until(
@@ -141,14 +142,11 @@ def collect_posts(browser):
                     posts_src.append(src)
                     date = collect_post_date(description)
                     if description and date:
-                        posts.append({"description": str(description), "date": str(date)})
-                        count += 1
+                        posts.append({"date": str(date), "caption": str(description)})
                     else:
-                        print("No new posts.")
-            print(f"Post {count}")
+                        continue
         except:
-            print("Error collecting posts.")
-        
+            pass
         browser.execute_script("window.scrollBy(0, document.body.scrollHeight)")
         time.sleep(random.randint(2, 3))
         altura_nova = browser.execute_script("return document.body.scrollHeight")
@@ -160,15 +158,3 @@ def collect_posts(browser):
 def collect_post_date(description):
     date_pattern = re.search(r'on (\w+ \d{1,2}, \d{4})', description)
     return date_pattern.group(1) if date_pattern else "Unknown"
-
-def main():
-    load_dotenv("src/defines/.env")
-    input_csv_file = "src/data/input/input.csv"
-    output_json_file = "src/data/output/outputSelenium.json"
-    usernames = get_usernames_from_csv(input_csv_file)
-    browser = navigator_initializer()
-    search_users(browser, usernames, output_json_file)
-    browser.quit()
-
-if __name__ == "__main__":
-    main()
