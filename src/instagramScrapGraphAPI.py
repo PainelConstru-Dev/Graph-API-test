@@ -23,6 +23,7 @@ def getAccountInfo(username, params):
 def search_accounts(browser, usernames, params, output_json_file):
     profiles = []
     already_searched = []
+    usernames = ["painelconstru"]
     for username in usernames:
         print(f"Searching for {username}")
         if verify_username(username, already_searched):
