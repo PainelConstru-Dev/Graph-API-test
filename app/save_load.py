@@ -3,9 +3,11 @@ import json
 import pandas
 
 def get_usernames_from_csv(input_csv_file):
-    with open(input_csv_file, "r", encoding="utf-8") as file:
-        search_info = pandas.read_csv(file)
-    urls = search_info["URL"].tolist()
+    try:
+        search_info = pandas.read_csv(input_csv_file, encoding="utf-8")
+    except pandas.errors.ParserError:
+        search_info = pandas.read_csv(input_csv_file, encoding="ISO-8859-1")
+    urls = search_info["contato"].tolist()
     usernames = [] 
     for url in urls:
         if "https://www.instagram.com/" in url:

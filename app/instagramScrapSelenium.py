@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from save_load import get_usernames_from_csv, save_profile_info_json
+from save_load import save_profile_info_json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -141,7 +141,7 @@ def collect_posts(browser):
                 if description and src not in posts_src:
                     posts_src.append(src)
                     date = collect_post_date(description)
-                    if description and date:
+                    if description and date and len(posts) < 10:
                         posts.append({"date": str(date), "caption": str(description)})
                     else:
                         continue

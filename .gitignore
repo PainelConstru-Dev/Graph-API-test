@@ -1,5 +1,5 @@
-*.pyc
-*.csv
-*.json
+__pycache__/
 *.env
 defines.py
+venv/
+data/
