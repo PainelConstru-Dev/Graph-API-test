@@ -11,11 +11,12 @@ def main():
 
     input_csv_file = sys.argv[1]
     output_file = input_csv_file.replace("parts", "output").replace(".csv", "_results.json")
-    
+    print(f"Input CSV file: {input_csv_file}")
     params = getCreds()
     usernames = get_usernames_from_csv(input_csv_file)
     browser = navigator_initializer()
     login_instagram(browser)
+    print("Logged in successfully.")
     profiles = search_accounts(browser, usernames, params, output_file)
     search_accounts_selenium(browser, profiles, output_file)
     browser.quit()

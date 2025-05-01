@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   scraper_1:
     build: .

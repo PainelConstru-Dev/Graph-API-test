@@ -21,6 +21,7 @@ def getAccountInfo(username, params):
 	return makeApiCall( url, endpointParams, params['debug'] ) # make the api call
 
 def search_accounts(browser, usernames, params, output_json_file):
+    print("Searching for accounts...")
     profiles = []
     already_searched = []
     accounts = [
@@ -51,6 +52,7 @@ def search_accounts(browser, usernames, params, output_json_file):
                             print("Limit reached. Switching account.")
                             continue
                         else:
+                            success = True
                             print("Error:", message)
                             profiles.append({"username": username, "business_account": 'false'})
                             save_profile_info_json({"username": username, "business_account": 'false'}, output_json_file)
