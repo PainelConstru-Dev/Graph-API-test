@@ -4,13 +4,19 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
-import os
+from selenium.webdriver.firefox.options import Options
 import random
 import re
+import os
+import time
 
 def navigator_initializer():
-    return webdriver.Firefox()
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    return webdriver.Firefox(options=options)
 
 def instagram_login(browser):
     load_dotenv("src/defines/.env")
@@ -29,25 +35,20 @@ def instagram_login(browser):
         time.sleep(1)
         login = WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
         login.click()
+        time.sleep(3)   
+        not_now = WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button' and @tabindex='0' and contains(text(), 'Not Now')]")))
+        not_now.click()
+        print("Login successful.")
     except:
         print("Login error.")
-
-def ignore_save_login(browser):
-    try:
-        time.sleep(3)   
-        not_now = WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button' and @tabindex='0' and contains(text(), 'Agora não')]")))
-        not_now.click()
-    except:
-        exit
-
-def login_instagram(browser):
-    instagram_login(browser)
-    ignore_save_login(browser)
-
+    
 def search_links_selenium(browser, username):
-    if search_user(browser, username):
-        links = collect_links(browser)
-        return links
+    browser.get(f"https://www.instagram.com/{username}/")
+    WebDriverWait(browser, 10).until(
+        EC.presence_of_element_located((By.TAG_NAME, "body"))
+    )
+    links = collect_links(browser)
+    return links
 
 def search_accounts_selenium(browser, profiles, output_selenium):
     for profile in profiles:
@@ -106,7 +107,7 @@ def collect_links(browser):
     link_urls = []
     try:
         WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "svg[aria-label='Ícone de link']"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "svg[aria-label='Link icon']"))
         ).click()
         links = WebDriverWait(browser, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//a[@rel='me nofollow noopener noreferrer']")))
@@ -115,7 +116,7 @@ def collect_links(browser):
             if href:
                 link_urls.append(href)
         WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "svg[aria-label='Fechar']"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "svg[aria-label='Close']"))
         ).click()
     except:
         try:

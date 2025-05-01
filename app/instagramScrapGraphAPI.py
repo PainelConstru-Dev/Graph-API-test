@@ -13,7 +13,7 @@ def getAccountInfo(username, params):
     """
 	params['debug'] = 'no' # set debug
 	endpointParams = dict() # parameter to send to the endpoint
-	endpointParams['fields'] = 'business_discovery.username(' + username + '){username,name,follows_count,followers_count,media_count,biography,website,profile_picture_url,media.limit(1){timestamp,like_count,comments_count,caption}}' # string of fields to get back with the request for the account
+	endpointParams['fields'] = 'business_discovery.username(' + username + '){username,name,follows_count,followers_count,media_count,biography,website,profile_picture_url,media.limit(10){timestamp,like_count,comments_count,caption}}' # string of fields to get back with the request for the account
 	endpointParams['access_token'] = params['access_token'] # access token
 
 	url = params['endpoint_base'] + params['instagram_account_id'] # endpoint url
@@ -21,7 +21,6 @@ def getAccountInfo(username, params):
 	return makeApiCall( url, endpointParams, params['debug'] ) # make the api call
 
 def search_accounts(browser, usernames, params, output_json_file):
-    print("Searching for accounts...")
     profiles = []
     already_searched = []
     accounts = [

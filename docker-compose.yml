@@ -5,8 +5,6 @@ services:
     command: python app/main.py data/parts/part_1.csv
     volumes:
       - .:/app
-    environment:
-      - MOZ_HEADLESS=1
 
   scraper_2:
     build: .
@@ -14,8 +12,6 @@ services:
     command: python app/main.py data/parts/part_2.csv
     volumes:
       - .:/app
-    environment:
-      - MOZ_HEADLESS=1
 
   scraper_3:
     build: .
@@ -23,8 +19,6 @@ services:
     command: python app/main.py data/parts/part_3.csv
     volumes:
       - .:/app
-    environment:
-      - MOZ_HEADLESS=1
 
   scraper_4:
     build: .
@@ -32,59 +26,3 @@ services:
     command: python app/main.py data/parts/part_4.csv
     volumes:
       - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_5:
-    build: .
-    container_name: scraper_5
-    command: python app/main.py data/parts/part_5.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_6:
-    build: .
-    container_name: scraper_6
-    command: python app/main.py data/parts/part_6.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_7:
-    build: .
-    container_name: scraper_7
-    command: python app/main.py data/parts/part_7.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_8:
-    build: .
-    container_name: scraper_8
-    command: python app/main.py data/parts/part_8.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_9:
-    build: .
-    container_name: scraper_9
-    command: python app/main.py data/parts/part_9.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
-
-  scraper_10:
-    build: .
-    container_name: scraper_10
-    command: python app/main.py data/parts/part_10.csv
-    volumes:
-      - .:/app
-    environment:
-      - MOZ_HEADLESS=1
