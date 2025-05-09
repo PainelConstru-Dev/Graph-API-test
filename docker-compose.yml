@@ -2,27 +2,27 @@ services:
   scraper_1:
     build: .
     container_name: scraper_1
-    command: python app/main.py data/parts/part_1.csv
+    command: python app/main.py data/parts/part_0.csv
     volumes:
       - .:/app
 
   scraper_2:
     build: .
     container_name: scraper_2
-    command: python app/main.py data/parts/part_2.csv
+    command: python app/main.py data/parts/part_1.csv
     volumes:
       - .:/app
 
   scraper_3:
     build: .
     container_name: scraper_3
-    command: python app/main.py data/parts/part_3.csv
+    command: python app/main.py data/parts/part_2.csv
     volumes:
       - .:/app
 
   scraper_4:
     build: .
     container_name: scraper_4
-    command: python app/main.py data/parts/part_4.csv
+    command: python app/main.py data/parts/part_3.csv
     volumes:
       - .:/app

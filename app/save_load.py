@@ -7,12 +7,17 @@ def get_usernames_from_csv(input_csv_file):
         search_info = pandas.read_csv(input_csv_file, encoding="utf-8")
     except pandas.errors.ParserError:
         search_info = pandas.read_csv(input_csv_file, encoding="ISO-8859-1")
-    urls = search_info["contato"].tolist()
-    usernames = [] 
-    for url in urls:
+
+    usernames = []
+    for _, row in search_info.iterrows():
+        url = str(row["contato"])
         if "https://www.instagram.com/" in url:
             username = url.split("https://www.instagram.com/")[1].split("/")[0]
-            usernames.append(username)
+            cnpj_basico = str(row["cnpj_basico"]).zfill(8)
+            cnpj_ordem = str(row["cnpj_ordem"]).zfill(4)
+            cnpj_dv = str(row["cnpj_dv"]).zfill(2)
+            cnpj = f"{cnpj_basico[:2]}.{cnpj_basico[2:5]}.{cnpj_basico[5:]}/{cnpj_ordem}-{cnpj_dv}"
+            usernames.append((username, cnpj))
     return usernames
 
 def save_profile_info_json(profiles, output_json_file):

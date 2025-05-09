@@ -13,7 +13,7 @@ def getAccountInfo(username, params):
     """
 	params['debug'] = 'no' # set debug
 	endpointParams = dict() # parameter to send to the endpoint
-	endpointParams['fields'] = 'business_discovery.username(' + username + '){username,name,follows_count,followers_count,media_count,biography,website,profile_picture_url,media.limit(10){timestamp,like_count,comments_count,caption}}' # string of fields to get back with the request for the account
+	endpointParams['fields'] = 'business_discovery.username(' + username + '){username,name,follows_count,followers_count,media_count,biography,website,profile_picture_url,media.limit(3999){timestamp,like_count,comments_count,caption}}' # string of fields to get back with the request for the account
 	endpointParams['access_token'] = params['access_token'] # access token
 
 	url = params['endpoint_base'] + params['instagram_account_id'] # endpoint url
@@ -31,10 +31,14 @@ def search_accounts(browser, usernames, params, output_json_file):
         {
             'access_token': params['access_token2'],
             'instagram_account_id': params['instagram_account_id2']
+        },
+        {
+            'access_token': params['access_token3'],
+            'instagram_account_id': params['instagram_account_id3']
         }
     ]
     
-    for username in usernames:
+    for username, cnpj in usernames:
         print(f"Searching for {username}")
 
         if verify_username(username, already_searched):
@@ -53,13 +57,13 @@ def search_accounts(browser, usernames, params, output_json_file):
                         else:
                             success = True
                             print("Error:", message)
-                            profiles.append({"username": username, "business_account": 'false'})
+                            profiles.append({"username": username, "cnpj": cnpj, "business_account": 'false'})
                             save_profile_info_json({"username": username, "business_account": 'false'}, output_json_file)
                             break
                     else:
                         success = True
                         links = search_links_selenium(browser, username)
-                        profile = save_profile(username, response, links)
+                        profile = save_profile(username, cnpj, response, links)
                         profiles.append(profile)
                         save_profile_info_json(profile, output_json_file)
                         already_searched.append(username)
@@ -75,7 +79,7 @@ def verify_username(username, already_searched):
         return False
     return True
 
-def save_profile(username, response, links):
+def save_profile(username, cnpj, response, links):
     business_discovery = response.get('json_data', {}).get('business_discovery', {})
     name = business_discovery.get('name')
     follows_count = business_discovery.get('follows_count')
@@ -85,6 +89,7 @@ def save_profile(username, response, links):
     profile_picture_url = business_discovery.get('profile_picture_url')
     media = business_discovery.get('media', {}).get('data', [])
     profile = {
+        "cnpj": cnpj,
         "username": username,
         "name": name,
         "business_account": 'true',

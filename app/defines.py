@@ -14,11 +14,13 @@ def getCreds() :
 	creds = dict() # dictionary to hold everything
 	creds['access_token'] = os.getenv('ACCESS_TOKEN') # access token for use with all api calls
 	creds['access_token2'] = os.getenv('ACCESS_TOKEN2') # access token for use with all api calls
+	creds['access_token3'] = os.getenv('ACCESS_TOKEN3') # access token for use with all api calls
 	creds['client_id'] = os.getenv('CLIENT_ID') # client id from facebook app IG Graph API Test
 	creds['client_secret'] = os.getenv('CLIENT_SECRET') # client secret from facebook app
 	creds['facebook_page_id'] = os.getenv('FACEBOOK_PAGE_ID') # users facebook page id
 	creds['instagram_account_id'] = os.getenv('INSTAGRAM_ACCOUNT_ID') # users instagram account id
 	creds['instagram_account_id2'] = os.getenv('INSTAGRAM_ACCOUNT_ID2') # users instagram account id
+	creds['instagram_account_id3'] = os.getenv('INSTAGRAM_ACCOUNT_ID3') # users instagram account id
 	creds['graph_domain'] = 'https://graph.facebook.com/' # base domain for api calls
 	creds['graph_version'] = 'v22.0' # version of the api we are hitting
 	creds['endpoint_base'] = creds['graph_domain'] + creds['graph_version'] + '/' # base endpoint with domain and version
